@@ -8,8 +8,7 @@
 
 #include <cmath>
 
-#include <perlin/perlin.h>
-#include <perlin/fractal.h>
+#include <curlnoise.h>
 
 #define ESCAPE 27
 #define KEY_Q 938
@@ -58,7 +57,9 @@ void DrawGLScene()
 	srand48( 0 );
 
 	perlin::NoiseFactory noiseFactory;
-	perlin::Noise3D* noise = noiseFactory.create3D();
+	curlnoise::CurlFactory curlFactory( noiseFactory );
+
+	curlnoise::Noise2D* curlnoise = curlFactory.create2D();
 
 	static float z=0;
 
@@ -73,6 +74,7 @@ void DrawGLScene()
 			float posX = i/10.0f;
 			float posY = j/10.0f;
 
+			/*
 			float rxp = fabs( 5.0f - posX );
 			float rxn = fabs( -5.0f - posX );
 
@@ -94,8 +96,10 @@ void DrawGLScene()
 
 			float velX = dy;
 			float velY = -dx;
+			*/
 
-			float vm = 20.0f;
+
+			curlnoise::Float2 vel = curlnoise->generate( posX, posY );
 
 			glColor3f( 0.0f, 0.0f, 0.0f );
 
@@ -103,11 +107,12 @@ void DrawGLScene()
 
 			glColor3f( 1.0f, 1.0f, 1.0f );
 
-			glVertex3f( posX + velX * vm, posY + velY * vm, -20.0f );
+			float vm = 20.0f;
+			glVertex3f( posX + vel.x * vm, posY + vel.y * vm, -20.0f );
         }
     }
 
-    delete noise;
+    delete curlnoise;
 
 	glEnd();
 
