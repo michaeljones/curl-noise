@@ -8,7 +8,7 @@
 
 #include <cmath>
 
-#include <curlnoise.h>
+#include <curlnoise/curlnoise.h>
 
 #define ESCAPE 27
 #define KEY_Q 938
@@ -59,7 +59,11 @@ void DrawGLScene()
 	perlin::NoiseFactory noiseFactory;
 	curlnoise::CurlFactory curlFactory( noiseFactory );
 
-	curlnoise::Noise2D* curlnoise = curlFactory.create2D();
+	std::vector< curlnoise::Line* > boundaries;
+
+	boundaries.push_back( new curlnoise::Line( curlnoise::Float2( 0.0f, 3.0f ), curlnoise::Float2( 0.0f, -5.0f ) ) );
+
+	curlnoise::Noise2D* curlnoise = curlFactory.create2D( boundaries );
 
 	static float z=0;
 
@@ -67,37 +71,15 @@ void DrawGLScene()
 
 	glBegin( GL_LINES );
 
+	glVertex3f( 0.0f, 3.0f, -20.0f );
+	glVertex3f( 0.0f, -2.0f, -20.0f );
+
     for ( int i=-50; i<50; ++i )
     {
         for ( int j=-50; j<50; ++j )
         {
 			float posX = i/10.0f;
 			float posY = j/10.0f;
-
-			/*
-			float rxp = fabs( 5.0f - posX );
-			float rxn = fabs( -5.0f - posX );
-
-			float ryp = fabs( 5.0f - posY );
-			float ryn = fabs( -5.0f - posY );
-
-			float rx = std::min( rxp, rxn );
-			float ry = std::min( ryp, ryn );
-
-			float r = std::min( rx, ry );
-
-			r /= 4.0f;
-			float scale = 1.0f;
-
-			if ( r < 1.0f ) scale = (15.0f/8.0f) * r - ( 10.0f/8.0f ) * r * r * r + ( 3.0f/8.0f ) * r * r * r * r * r;
-
-			float dy = scale * ( noise->generate( posX, posY + 0.01, z ) - noise->generate( posX, posY - 0.01, z ) );
-			float dx = scale * ( noise->generate( posX + 0.01, posY, z ) - noise->generate( posX - 0.01, posY, z ) );
-
-			float velX = dy;
-			float velY = -dx;
-			*/
-
 
 			curlnoise::Float2 vel = curlnoise->generate( posX, posY );
 
@@ -107,7 +89,7 @@ void DrawGLScene()
 
 			glColor3f( 1.0f, 1.0f, 1.0f );
 
-			float vm = 20.0f;
+			float vm = 10.0f;
 			glVertex3f( posX + vel.x * vm, posY + vel.y * vm, -20.0f );
         }
     }
