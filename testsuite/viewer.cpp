@@ -16,6 +16,9 @@
 /* The number of our GLUT window */
 int window; 
 
+const int particleCount = 10000;
+curlnoise::Float2 positions[ particleCount ];
+
 void InitGL(int Width, int Height)
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);		// This Will Clear The Background Color To Black
@@ -62,6 +65,8 @@ void DrawGLScene()
 	std::vector< curlnoise::Line* > boundaries;
 
 	boundaries.push_back( new curlnoise::Line( curlnoise::Float2( 0.0f, 3.0f ), curlnoise::Float2( 0.0f, -5.0f ) ) );
+	boundaries.push_back( new curlnoise::Line( curlnoise::Float2( -10.0f, 10.0f ), curlnoise::Float2( 0.0f, -20.0f ) ) );
+	boundaries.push_back( new curlnoise::Line( curlnoise::Float2( -10.0f, 3.0f ), curlnoise::Float2( 10.0f, 0.0f ) ) );
 
 	curlnoise::Noise2D* curlnoise = curlFactory.create2D( boundaries );
 
@@ -74,10 +79,17 @@ void DrawGLScene()
 	glVertex3f( 0.0f, 3.0f, -20.0f );
 	glVertex3f( 0.0f, -2.0f, -20.0f );
 
-    for ( int i=-50; i<50; ++i )
-    {
-        for ( int j=-50; j<50; ++j )
-        {
+	glVertex3f( -10.0f, 10.0f, -20.0f );
+	glVertex3f( -10.0f, -10.0f, -20.0f );
+
+	glVertex3f( -10.0f, 3.0f, -20.0f );
+	glVertex3f( 0.0f, 3.0f, -20.0f );
+
+	/*
+	for ( int i=-50; i<50; ++i )
+	{
+		for ( int j=-50; j<50; ++j )
+		{
 			float posX = i/10.0f;
 			float posY = j/10.0f;
 
@@ -91,12 +103,39 @@ void DrawGLScene()
 
 			float vm = 10.0f;
 			glVertex3f( posX + vel.x * vm, posY + vel.y * vm, -20.0f );
-        }
-    }
-
-    delete curlnoise;
+		}
+	}
+	*/
 
 	glEnd();
+
+	glBegin( GL_LINES );
+
+	for ( int i=0; i<particleCount; ++i )
+	{
+		glVertex3f( positions[ i ].x, positions[ i ].y, -20.0f );
+
+		curlnoise::Float2 vel = curlnoise->generate( positions[i].x, positions[i].y );
+
+		positions[ i ].x += vel.x;
+		positions[ i ].y += vel.y;
+
+		glVertex3f( positions[ i ].x, positions[ i ].y, -20.0f );
+	}
+
+	glEnd();
+
+	glBegin( GL_POINTS );
+
+	for ( int i=0; i<particleCount; ++i )
+	{
+		glVertex3f( positions[ i ].x, positions[ i ].y, -20.0f );
+	}
+
+	glEnd();
+
+	delete curlnoise;
+
 
 	glutSwapBuffers();
 }
@@ -120,6 +159,14 @@ void keyPressed(unsigned char key, int x, int y)
 
 int main(int argc, char **argv) 
 {	
+
+	for ( int i=0; i<particleCount; ++i )
+	{
+		positions[ i ].x = ( drand48() - 0.5f ) * 20.0f;
+		positions[ i ].y = ( drand48() - 0.5f ) * 20.0f;
+	}
+
+
 	/* Initialize GLUT state - glut will take any command line arguments that pertain to it or 
 		 X Windows - look at its documentation at http://reality.sgi.com/mjk/spec3/spec3.html */	
 	glutInit(&argc, argv);	
@@ -138,7 +185,7 @@ int main(int argc, char **argv)
 	glutInitWindowPosition(0, 0);	
 
 	/* Open a window */	
-	window = glutCreateWindow("Jeff Molofee's GL Code Tutorial ... NeHe '99");	
+	window = glutCreateWindow("Curl Noise");	
 
 	/* Register the function to do all our OpenGL drawing. */
 	glutDisplayFunc(&DrawGLScene);	

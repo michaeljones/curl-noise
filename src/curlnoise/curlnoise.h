@@ -46,7 +46,7 @@ public:
 
 		float scale = 1.0f;
 		float r = minDistanceSq;
-		r /= 4.0;
+		r /= 1.0;
 		if ( r < 1.0f )
 		{
 			scale = (15.0f/8.0f) * r - ( 10.0f/8.0f ) * r * r * r + ( 3.0f/8.0f ) * r * r * r * r * r;
