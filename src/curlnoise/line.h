@@ -1,8 +1,6 @@
 #ifndef CURLNOISE_LINE_H
 #define CURLNOISE_LINE_H
 
-#include <curlnoise/line.h>
-
 namespace curlnoise
 {
 
