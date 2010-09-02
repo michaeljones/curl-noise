@@ -62,55 +62,40 @@ void DrawGLScene()
 	perlin::NoiseFactory noiseFactory;
 	curlnoise::CurlFactory curlFactory( noiseFactory );
 
-	std::vector< curlnoise::Line* > boundaries;
+	curlnoise::LineFactory lineFactory;
 
-	boundaries.push_back( new curlnoise::Line( curlnoise::Float2( 0.0f, 3.0f ), curlnoise::Float2( 0.0f, -5.0f ) ) );
-	boundaries.push_back( new curlnoise::Line( curlnoise::Float2( -10.0f, 10.0f ), curlnoise::Float2( 0.0f, -20.0f ) ) );
-	boundaries.push_back( new curlnoise::Line( curlnoise::Float2( -10.0f, 3.0f ), curlnoise::Float2( 10.0f, 0.0f ) ) );
+	std::vector< curlnoise::Object* > objects;
 
-	curlnoise::Noise2D* curlnoise = curlFactory.create2D( boundaries );
+	std::vector< curlnoise::Line* > lines;
+	lines.push_back( lineFactory.create( curlnoise::Float2( 0.0f, 3.0f ), curlnoise::Float2( 0.0f, -5.0f ) ) );
+	lines.push_back( lineFactory.create( curlnoise::Float2( -10.0f, 10.0f ), curlnoise::Float2( 0.0f, -20.0f ) ) );
+	lines.push_back( lineFactory.create( curlnoise::Float2( -10.0f, 3.0f ), curlnoise::Float2( 10.0f, 0.0f ) ) );
+	objects.push_back( new curlnoise::StaticObject( lines ) );
+
+	std::vector< curlnoise::Line* > boxLines;
+	boxLines.push_back( lineFactory.between( curlnoise::Float2( 0.0f, 0.0f ), curlnoise::Float2( 1.0f, 0.0f ) ) );
+	boxLines.push_back( lineFactory.between( curlnoise::Float2( 1.0f, 0.0f ), curlnoise::Float2( 1.0f, 1.0f ) ) );
+	boxLines.push_back( lineFactory.between( curlnoise::Float2( 1.0f, 1.0f ), curlnoise::Float2( 0.0f, 1.0f ) ) );
+	boxLines.push_back( lineFactory.between( curlnoise::Float2( 0.0f, 1.0f ), curlnoise::Float2( 0.0f, 0.0f ) ) );
+	objects.push_back( new curlnoise::StaticObject( boxLines ) );
+
+	curlnoise::Noise2D* curlnoise = curlFactory.create2D( objects );
 
 	static float z=0;
 
 	z += 0.01f;
 
-	glBegin( GL_LINES );
+	std::vector< curlnoise::Object* >::iterator it = objects.begin();
+	std::vector< curlnoise::Object* >::iterator end = objects.end();
 
-	glVertex3f( 0.0f, 3.0f, -20.0f );
-	glVertex3f( 0.0f, -2.0f, -20.0f );
-
-	glVertex3f( -10.0f, 10.0f, -20.0f );
-	glVertex3f( -10.0f, -10.0f, -20.0f );
-
-	glVertex3f( -10.0f, 3.0f, -20.0f );
-	glVertex3f( 0.0f, 3.0f, -20.0f );
-
-	/*
-	for ( int i=-50; i<50; ++i )
+	for ( ; it != end; ++it )
 	{
-		for ( int j=-50; j<50; ++j )
-		{
-			float posX = i/10.0f;
-			float posY = j/10.0f;
-
-			curlnoise::Float2 vel = curlnoise->generate( posX, posY );
-
-			glColor3f( 0.0f, 0.0f, 0.0f );
-
-			glVertex3f( posX, posY, -20.0f );
-
-			glColor3f( 1.0f, 1.0f, 1.0f );
-
-			float vm = 10.0f;
-			glVertex3f( posX + vel.x * vm, posY + vel.y * vm, -20.0f );
-		}
+		(*it)->draw();
 	}
-	*/
-
-	glEnd();
 
 	glBegin( GL_LINES );
 
+	// Animate points and draw lines
 	for ( int i=0; i<particleCount; ++i )
 	{
 		glVertex3f( positions[ i ].x, positions[ i ].y, -20.0f );

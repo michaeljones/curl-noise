@@ -2,7 +2,7 @@
 #define CURLNOISE_H
 
 #include <perlin/perlin.h>
-#include "line.h"
+#include "object.h"
 
 #include <vector>
 
@@ -15,9 +15,9 @@ class Noise2D
 {
 public:
 
-	Noise2D( perlin::Noise2D* noise, std::vector< Line* > boundaries )
+	Noise2D( perlin::Noise2D* noise, std::vector< Object* > objects )
 	 : m_noise( noise ),
-	   m_boundaries( boundaries ) {}
+	   m_objects( objects ) {}
 
 	~Noise2D()
 	{
@@ -43,8 +43,8 @@ public:
 	{
 		Float2 p( x, y );
 
-		std::vector< Line* >::const_iterator it = m_boundaries.begin();
-		std::vector< Line* >::const_iterator end = m_boundaries.end();
+		std::vector< Object* >::const_iterator it = m_objects.begin();
+		std::vector< Object* >::const_iterator end = m_objects.end();
 
 		// TODO: Fix
 		float minDistanceSq = 10000.0f;
@@ -70,7 +70,7 @@ public:
 private:
 
 	perlin::Noise2D* m_noise;
-	std::vector< Line* > m_boundaries;
+	std::vector< Object* > m_objects;
 };
 
 
@@ -81,7 +81,7 @@ public:
 	CurlFactory( perlin::NoiseFactory factory )
 	 : m_noiseFactory( factory ) {}
 
-	Noise2D* create2D( std::vector< Line* > boundaries )
+	Noise2D* create2D( std::vector< Object* > boundaries )
 	{
 		perlin::Noise2D* perlinNoise = m_noiseFactory.create2D();
 
