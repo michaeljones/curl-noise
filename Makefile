@@ -1,8 +1,8 @@
 
-INCLUDE=-Isrc -I/home/mike/projects/tools/include/OpenEXR -I ../perlin-noise/src
+INCLUDE=-Isrc -I$(TOOLS)/include/OpenEXR -I ../perlin-noise/src
 
 LIBS=-lImath -lIlmImf -lpthread
-LIBPATH=-L/home/mike/projects/tools/lib
+LIBPATH=-L$(TOOLS)/lib
 
 CPPFLAGS=-pg -Wall
 
